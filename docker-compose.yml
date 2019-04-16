@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+            
+    springboot:
+        image: joaoverissimo/ftpbatch
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=master
+            - CONFIG_FTP_HOST=ftpserver
+            - SERVER_PORT=8082
+        ports:
+            - "8082:8082"
+        depends_on:
+            - db
+            - ftpserver
+
+    db:
+        image: "mcr.microsoft.com/mssql/server"
+        environment:
+            SA_PASSWORD: "Your_password123"
+            ACCEPT_EULA: "Y"
+        ports:
+            - "1433:1433"
+    
+    ftpserver:
+        image: stilliard/pure-ftpd:hardened
+        container_name: pure-ftpd
+        ports:
+            - "21:21"
+            - "30000-30009:30000-30009"
+        volumes: 
+            - "./ftp-data-files/:/home/username/"
+        environment:
+            PUBLICHOST: ftpserver
+            FTP_USER_NAME: username
+            FTP_USER_PASS: mypass
+            FTP_USER_HOME: /home/username
